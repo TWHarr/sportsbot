@@ -41,6 +41,8 @@ footballm = []
 footballg = []
 basketballm = []
 basketballg = []
+esportsm = []
+esportsg = []
 
 
 def lastsix():
@@ -115,11 +117,23 @@ def getBasketball():
             basketballm.append(row[0])
             basketballg.append(row[1])
 
+def getEsports():
+    rq = db.execute_sql("""SELECT DATE_FORMAT(a.matchdate, %s) GameDate,
+                        COUNT(a.hometeam) Games FROM games a JOIN leagues b on
+                        a.league = b.leagues WHERE b.sports = %s GROUP BY
+                        GameDate, b.sports ORDER BY a.matchdate""",
+                        ('%m/%y', 'esports'))
+    for row in rq.fetchall():
+        if row[0] in months:
+            esportsm.append(row[0])
+            esportsg.append(row[1])
+
 getFootball()
 getSoccer()
 getBaseball()
 getHockey()
 getBasketball()
+getEsports()
 
 trace2 = Bar(
     x=footballm,
@@ -151,7 +165,13 @@ trace5 = Bar(
     name='Basketball'
 )
 
-data = Data([trace1, trace2, trace3, trace4, trace5])
+trace6 = Bar(
+    x=esportsm,
+    y=esportsg,
+    name='Esports'
+)
+
+data = Data([trace1, trace2, trace3, trace4, trace5, trace6])
 layout = Layout(
     barmode='stack',
     title='Games Per Month',

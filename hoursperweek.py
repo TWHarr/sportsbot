@@ -46,6 +46,8 @@ footballm = []
 footballg = []
 basketballm = []
 basketballg = []
+esportsm = []
+esportsg = []
 
 
 def lastmonth():
@@ -148,6 +150,20 @@ def getbasketball():
 
 getbasketball()
 
+def getEsports():
+    rq = db.execute_sql("""SELECT a.matchdate thedate, SUM(b.gtime) GameTime
+                        FROM games a JOIN leagues c ON a.league = c.leagues
+                        JOIN gametime b ON c.sports = b.sport WHERE b.sport =
+                        'esports' GROUP BY DATE_FORMAT(thedate, %s) ORDER BY
+                        thedate ASC """, ('%U/%Y'))
+    for row in rq.fetchall():
+        if row[0] in month:
+            baseballm.append(get_week_days(int(row[0].strftime('%Y')),
+                             int(row[0].strftime('%U'))))
+            baseballg.append(int(row[1]))
+
+getEsports()
+
 
 trace2 = Bar(
     x=footballm,
@@ -176,10 +192,16 @@ trace4 = Bar(
 trace5 = Bar(
     x=basketballm,
     y=basketballg,
-    name='Hockey'
+    name='Basketball'
 )
 
-data = Data([trace1, trace2, trace3, trace4])
+trace6 = Bar(
+    x=esportsm,
+    y=esportsg,
+    name='Esports'
+)
+
+data = Data([trace1, trace2, trace3, trace4, trace5, trace6])
 layout = Layout(
     barmode='stack',
     title='Hours Per Week',
