@@ -44,8 +44,8 @@ def getLast():
     homeFeed = twitter.get_user_timeline(user_id=settings.bot, count=100)
     global lastTweet
     for tweet in homeFeed:
-        if ((tweet['text'][:15] == "@DoHimJob added") |
-           (tweet['text'][:15] == "@DoHimJob no")):
+        if ((tweet['text'][:15] == "@NAME added") |
+           (tweet['text'][:15] == "@NAME no")):
             lastTweet = int(tweet['id'])
             break
 
@@ -65,7 +65,7 @@ def manual(tweet):
     Administer manual tweets.
 
     Manual format should be:
-    @DoHimJobSports manual [Home, Away, Homescore, AwayScore, League,
+    @NAMESports manual [Home, Away, Homescore, AwayScore, League,
                             Stage, View]
     """
     tweetText = tweet['text'][23:]
@@ -81,7 +81,7 @@ def manual(tweet):
     new.stage = tweetArray[5]
     new.view = tweetArray[6]
     new.save()
-    newTweet = "@DoHimJob added {}.".format(tweetArray)
+    newTweet = "@NAME added {}.".format(tweetArray)
     twitter.update_status(status=newTweet,
                           in_reply_to_status_id=int(tweet['id']))
 
@@ -90,7 +90,7 @@ def normal(tweet):
     """Administer normal tweets.
 
     Format should be:
-    @DoHimJobSports yes, League, Stage, View
+    @NAMESports yes, League, Stage, View
     """
     tweetText = tweet['text']
     replyTweet = tweet['in_reply_to_status_id']
@@ -98,7 +98,7 @@ def normal(tweet):
 
     print originalTweet['text'][:31]
 
-    if originalTweet['text'][:31] == '@DoHimJob Did you watch? Final:':
+    if originalTweet['text'][:31] == '@NAME Did you watch? Final:':
         tweetArray = [x.strip() for x in tweetText.split(',')]
         originalText = originalTweet['text'][32:-7]
         s = ' '
@@ -122,11 +122,11 @@ def normal(tweet):
         new.matchdate = date.today()
         new.save()
 
-        newTweet = "@DoHimJob added {} - {}.".format(hteam, ateam)
+        newTweet = "@NAME added {} - {}.".format(hteam, ateam)
         twitter.update_status(status=newTweet,
                               in_reply_to_status_id=int(tweet['id']))
 
-    elif originalTweet['text'][:29] == '@DoHimJob Did you watch? FT -':
+    elif originalTweet['text'][:29] == '@NAME Did you watch? FT -':
         tweetArray = [x.strip() for x in tweetText.split(',')]
         s = " "
         originalText = originalTweet['text'][30:-7]
@@ -149,7 +149,7 @@ def normal(tweet):
         new.matchdate = date.today()
         new.save()
 
-        newTweet = "@DoHimJob added {} - {}.".format(hteam, ateam)
+        newTweet = "@NAME added {} - {}.".format(hteam, ateam)
         twitter.update_status(status=newTweet,
                               in_reply_to_status_id=int(tweet['id']))
 
@@ -158,9 +158,9 @@ def process(tweets):
     """Process tweets from Tim."""
 
     for tweet in tweets:
-        if tweet['text'][:19] == "@DoHimJobSports yes":
+        if tweet['text'][:19] == "@NAMESports yes":
             normal(tweet)
-        elif tweet['text'][:22] == "@DoHimJobSports manual":
+        elif tweet['text'][:22] == "@NAMESports manual":
             manual(tweet)
 
 getLast()
