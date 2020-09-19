@@ -3,8 +3,8 @@ import settings
 import pandas as pd
 import peewee
 from peewee import *
-import plotly.plotly as py
-from plotly.graph_objs import *
+import chart_studio.plotly as py
+import plotly.graph_objects as go
 
 db = MySQLDatabase(settings.dbname,
                    user=settings.dbuser,
@@ -41,9 +41,7 @@ for row in rq.fetchall():
     toPush = (row[0], row[1])
     toPandas.append(toPush)
 
-print toPandas
 toPandas = tuple(toPandas)
-print toPandas
 
 
 df = pd.DataFrame([[ij for ij in i] for i in toPandas])
@@ -64,4 +62,4 @@ fig = {
     'layout': {'title': "Games By Stage"}
 }
 
-py.iplot(fig, validate=False, filename='GamesByStage')
+py.plot(fig, validate=False, filename='GamesByStage')

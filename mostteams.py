@@ -3,8 +3,8 @@ import settings
 import pandas as pd
 import peewee
 from peewee import *
-import plotly.plotly as py
-from plotly.graph_objs import *
+import chart_studio.plotly as py
+import plotly.graph_objects as go
 
 db = MySQLDatabase(settings.dbname,
                    user=settings.dbuser,
@@ -57,7 +57,7 @@ colors = dict(
     Baseball='#2ca02c',
     Football='#FC7E1A',
     Basketball='#9264BC',
-    Esports ='8C564B'
+    Esports='8C564B'
 )
 color = []
 
@@ -66,24 +66,18 @@ for index, row in df.iterrows():
 
 
 data = [
-    Bar(
+    go.Bar(
         x=df['Team'],
         y=df['Games'],
         text=df['Sport'],
-        marker=Marker(
+        marker=dict(
             color=color
         )
     )
 ]
-layout = Layout(
-    title='Games By Team',
-    xaxis=XAxis(
-        title='Team'
-    ),
-    yaxis=YAxis(
-        title='Games Watched'
-    )
-)
 
-fig = Figure(data=data, layout=layout)
-py.iplot(fig, filename='GamesByTeam')
+fig = go.Figure(data=data)
+fig.update_layout(title='GamesByTeam')
+fig.update_xaxes(title_text="Team")
+fig.update_yaxes(title_text="Games Watched")
+py.plot(fig, filename='GamesByTeam')

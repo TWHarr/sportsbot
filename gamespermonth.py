@@ -2,8 +2,8 @@
 import settings
 import peewee
 from peewee import *
-import plotly.plotly as py
-from plotly.graph_objs import *
+import chart_studio.plotly as py
+import plotly.graph_objects as go
 
 
 db = MySQLDatabase(settings.dbname,
@@ -31,6 +31,7 @@ class leagues(BaseModel):
     leagues = peewee.CharField()
     sports = peewee.CharField()
 
+
 hockeym = []
 hockeyg = []
 baseballm = []
@@ -55,6 +56,7 @@ def lastsix():
     for row in rq.fetchall():
         a.append(row[0])
     return a
+
 
 months = lastsix()
 
@@ -106,6 +108,7 @@ def getFootball():
             footballm.append(row[0])
             footballg.append(row[1])
 
+
 def getBasketball():
     rq = db.execute_sql("""SELECT DATE_FORMAT(a.matchdate, %s) GameDate,
                         COUNT(a.hometeam) Games FROM games a JOIN leagues b on
@@ -116,6 +119,7 @@ def getBasketball():
         if row[0] in months:
             basketballm.append(row[0])
             basketballg.append(row[1])
+
 
 def getEsports():
     rq = db.execute_sql("""SELECT DATE_FORMAT(a.matchdate, %s) GameDate,
@@ -128,6 +132,7 @@ def getEsports():
             esportsm.append(row[0])
             esportsg.append(row[1])
 
+
 getFootball()
 getSoccer()
 getBaseball()
@@ -135,53 +140,55 @@ getHockey()
 getBasketball()
 getEsports()
 
-trace2 = Bar(
+trace2 = go.Bar(
     x=footballm,
     y=footballg,
     name='Football'
 )
 
-trace1 = Bar(
+trace1 = go.Bar(
     x=soccerm,
     y=soccerg,
     name='Soccer'
 )
 
-trace3 = Bar(
+trace3 = go.Bar(
     x=baseballm,
     y=baseballg,
     name='Baseball'
 )
 
-trace4 = Bar(
+trace4 = go.Bar(
     x=hockeym,
     y=hockeyg,
     name='Hockey'
 )
 
-trace5 = Bar(
+trace5 = go.Bar(
     x=basketballm,
     y=basketballg,
     name='Basketball'
 )
 
-trace6 = Bar(
+trace6 = go.Bar(
     x=esportsm,
     y=esportsg,
     name='Esports'
 )
 
-data = Data([trace1, trace2, trace3, trace4, trace5, trace6])
-layout = Layout(
-    barmode='stack',
-    title='Games Per Month',
+data = [trace1, trace2, trace3, trace4, trace5, trace6]
+"""
+layout = [
     xaxis=XAxis(
         title='Month'
     ),
     yaxis=YAxis(
         title='Games Watched'
     )
-)
-
-fig = Figure(data=data, layout=layout)
-py.iplot(fig, filename='GamesPerMonth')
+]
+"""
+fig = go.Figure(data=data)
+fig.update_layout(barmode='stack', title='Games Per Month')
+fig.update_xaxes(title_text='Month')
+fig.update_yaxes(title_text='Games Watched')
+py.plot(fig, filename='GamesPerMonth')

@@ -2,8 +2,8 @@
 import settings
 import peewee
 from peewee import *
-import plotly.plotly as py
-from plotly.graph_objs import *
+import chart_studio.plotly as py
+import plotly.graph_objects as go
 import datetime
 
 db = MySQLDatabase(settings.dbname,
@@ -36,6 +36,7 @@ class gametime(BaseModel):
     sport = peewee.CharField()
     gtime = peewee.IntegerField()
 
+
 hockeym = []
 hockeyg = []
 baseballm = []
@@ -61,20 +62,19 @@ def lastmonth():
         a.append(row[0])
     return a
 
+
 month = lastmonth()
-print month
+print(month)
 
 
 def get_week_days(year, week):
     d = datetime.datetime(year, 1, 1)
     if(d.weekday() > 3):
-        d = d+datetime.timedelta(7-d.weekday())
+        d = d + datetime.timedelta(7 - d.weekday())
     else:
         d = d - datetime.timedelta(d.weekday())
-    dlt = datetime.timedelta(days=(week-1) * 7)
-    return (datetime.datetime.strftime(d + dlt, '%m/%d') + '-' +
-            datetime.datetime.strftime(d + dlt + datetime.timedelta(days=6),
-            '%m/%d'))
+    dlt = datetime.timedelta(days=(week - 1) * 7)
+    return (datetime.datetime.strftime(d + dlt, '%m/%d') + '-' + datetime.datetime.strftime(d + dlt + datetime.timedelta(days=6), '%m/%d'))
 
 
 def getBaseball():
@@ -88,6 +88,7 @@ def getBaseball():
             baseballm.append(get_week_days(int(row[0].strftime('%Y')),
                              int(row[0].strftime('%U'))))
             baseballg.append(int(row[1]))
+
 
 getBaseball()
 
@@ -104,6 +105,7 @@ def gethockey():
                            int(row[0].strftime('%U'))))
             hockeyg.append(int(row[1]))
 
+
 gethockey()
 
 
@@ -118,6 +120,7 @@ def getsoccer():
             soccerm.append(get_week_days(int(row[0].strftime('%Y')),
                            int(row[0].strftime('%U'))))
             soccerg.append(int(row[1]))
+
 
 getsoccer()
 
@@ -134,7 +137,9 @@ def getfootball():
                              int(row[0].strftime('%U'))))
             footballg.append(int(row[1]))
 
+
 getfootball()
+
 
 def getbasketball():
     rq = db.execute_sql("""SELECT a.matchdate thedate, SUM(b.gtime) GameTime
@@ -145,10 +150,12 @@ def getbasketball():
     for row in rq.fetchall():
         if row[0] in month:
             basketballm.append(get_week_days(int(row[0].strftime('%Y')),
-                             int(row[0].strftime('%U'))))
+                               int(row[0].strftime('%U'))))
             basketballg.append(int(row[1]))
 
+
 getbasketball()
+
 
 def getEsports():
     rq = db.execute_sql("""SELECT a.matchdate thedate, SUM(b.gtime) GameTime
@@ -162,56 +169,50 @@ def getEsports():
                              int(row[0].strftime('%U'))))
             baseballg.append(int(row[1]))
 
+
 getEsports()
 
 
-trace2 = Bar(
+trace2 = go.Bar(
     x=footballm,
     y=footballg,
     name='Football'
 )
 
-trace1 = Bar(
+trace1 = go.Bar(
     x=soccerm,
     y=soccerg,
     name='Soccer'
 )
 
-trace3 = Bar(
+trace3 = go.Bar(
     x=baseballm,
     y=baseballg,
     name='Baseball'
 )
 
-trace4 = Bar(
+trace4 = go.Bar(
     x=hockeym,
     y=hockeyg,
     name='Hockey'
 )
 
-trace5 = Bar(
+trace5 = go.Bar(
     x=basketballm,
     y=basketballg,
     name='Basketball'
 )
 
-trace6 = Bar(
+trace6 = go.Bar(
     x=esportsm,
     y=esportsg,
     name='Esports'
 )
 
-data = Data([trace1, trace2, trace3, trace4, trace5, trace6])
-layout = Layout(
-    barmode='stack',
-    title='Hours Per Week',
-    xaxis=XAxis(
-        title='Week'
-    ),
-    yaxis=YAxis(
-        title='Hours'
-    )
-)
+data = [trace1, trace2, trace3, trace4, trace5, trace6]
 
-fig = Figure(data=data, layout=layout)
-py.iplot(fig, filename='Hoursperweek')
+fig = go.Figure(data=data)
+fig.update_layout(title='Hours Per Week', barmode='stack')
+fig.update_xaxes(title_text='Week')
+fig.update_yaxes(title_text='Hours')
+py.plot(fig, filename='Hoursperweek')

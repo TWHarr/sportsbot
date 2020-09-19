@@ -3,8 +3,8 @@ import settings
 import pandas as pd
 import peewee
 from peewee import *
-import plotly.plotly as py
-from plotly.graph_objs import *
+import chart_studio.plotly as py
+import plotly.graph_objects as go
 
 db = MySQLDatabase(settings.dbname,
                    user=settings.dbuser,
@@ -34,7 +34,7 @@ class leagues(BaseModel):
 
 rq = db.execute_sql("""select a.leagues, COUNT(b.hometeam) number, a.sports
                     from leagues a join games b on b.league=a.leagues GROUP BY
-                    a.leagues ORDER BY number DESC""")
+                    a.leagues ORDER BY number DESC LIMIT 20""")
 
 toPandas = []
 
@@ -62,24 +62,18 @@ for index, row in df.iterrows():
 
 
 data = [
-    Bar(
+    go.Bar(
         x=df['League'],
         y=df['Games'],
         text=df['Sport'],
-        marker=Marker(
+        marker=dict(
             color=color
         )
     )
 ]
-layout = Layout(
-    title='Games By League',
-    xaxis=XAxis(
-        title='League'
-    ),
-    yaxis=YAxis(
-        title='Games Watched'
-    )
-)
 
-fig = Figure(data=data, layout=layout)
-py.iplot(fig, filename='GamesByLeague')
+fig = go.Figure(data=data)
+fig.update_layout(title="Games by League")
+fig.update_xaxes(title_text="League (Top 20)")
+fig.update_yaxes(title_text="Games Watched")
+py.plot(fig, filename='GamesByLeague')

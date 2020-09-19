@@ -3,9 +3,8 @@ import settings
 import pandas as pd
 import peewee
 from peewee import *
-import plotly.plotly as py
-from plotly.graph_objs import *
-# from datetime import date
+import chart_studio.plotly as py
+import plotly.graph_objects as go
 
 db = MySQLDatabase(settings.dbname,
                    user=settings.dbuser,
@@ -62,4 +61,4 @@ fig = {
     'layout': {'title': "Games By Sport"}
 }
 
-py.iplot(fig, validate=False, filename='GamesPerSport')
+py.plot(fig, validate=False, filename='GamesPerSport')
