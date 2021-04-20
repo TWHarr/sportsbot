@@ -44,6 +44,8 @@ basketballm = []
 basketballg = []
 esportsm = []
 esportsg = []
+T20m = []
+T20g = []
 
 
 def lastsix():
@@ -132,6 +134,17 @@ def getEsports():
             esportsm.append(row[0])
             esportsg.append(row[1])
 
+def getT20():
+    rq = db.execute_sql("""SELECT DATE_FORMAT(a.matchdate, %s) GameDate,
+                        COUNT(a.hometeam) Games FROM games a JOIN leagues b on
+                        a.league = b.leagues WHERE b.sports = %s GROUP BY
+                        GameDate, b.sports ORDER BY a.matchdate""",
+                        ('%m/%y', 'T20'))
+    for row in rq.fetchall():
+        if row[0] in months:
+            T20m.append(row[0])
+            T20g.append(row[1])
+
 
 getFootball()
 getSoccer()
@@ -139,6 +152,7 @@ getBaseball()
 getHockey()
 getBasketball()
 getEsports()
+getT20()
 
 trace2 = go.Bar(
     x=footballm,
@@ -176,7 +190,13 @@ trace6 = go.Bar(
     name='Esports'
 )
 
-data = [trace1, trace2, trace3, trace4, trace5, trace6]
+trace7 = go.Bar(
+    x=T20m,
+    y=T20g,
+    name='T20'
+)
+
+data = [trace1, trace2, trace3, trace4, trace5, trace6, trace7]
 """
 layout = [
     xaxis=XAxis(

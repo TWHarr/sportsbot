@@ -57,7 +57,8 @@ colors = dict(
     Baseball='#2ca02c',
     Football='#FC7E1A',
     Basketball='#9264BC',
-    Esports='8C564B'
+    Esports='8C564B',
+    T20='#D372B7'
 )
 color = []
 

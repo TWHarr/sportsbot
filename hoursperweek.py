@@ -49,6 +49,8 @@ basketballm = []
 basketballg = []
 esportsm = []
 esportsg = []
+T20m = []
+T20g = []
 
 
 def lastmonth():
@@ -165,12 +167,27 @@ def getEsports():
                         thedate ASC """, ('%U/%Y'))
     for row in rq.fetchall():
         if row[0] in month:
-            baseballm.append(get_week_days(int(row[0].strftime('%Y')),
+            esportsm.append(get_week_days(int(row[0].strftime('%Y')),
                              int(row[0].strftime('%U'))))
-            baseballg.append(int(row[1]))
+            esportsg.append(int(row[1]))
 
 
 getEsports()
+
+def getT20():
+    rq = db.execute_sql("""SELECT a.matchdate thedate, SUM(b.gtime) GameTime
+                        FROM games a JOIN leagues c ON a.league = c.leagues
+                        JOIN gametime b ON c.sports = b.sport WHERE b.sport =
+                        'T20' GROUP BY DATE_FORMAT(thedate, %s) ORDER BY
+                        thedate ASC """, ('%U/%Y'))
+    for row in rq.fetchall():
+        if row[0] in month:
+            T20m.append(get_week_days(int(row[0].strftime('%Y')),
+                             int(row[0].strftime('%U'))))
+            T20g.append(int(row[1]))
+
+
+getT20()
 
 
 trace2 = go.Bar(
@@ -209,7 +226,13 @@ trace6 = go.Bar(
     name='Esports'
 )
 
-data = [trace1, trace2, trace3, trace4, trace5, trace6]
+trace7 = go.Bar(
+    x=T20m,
+    y=T20g,
+    name='T20'
+)
+
+data = [trace1, trace2, trace3, trace4, trace5, trace6, trace7]
 
 fig = go.Figure(data=data)
 fig.update_layout(title='Hours Per Week', barmode='stack')
